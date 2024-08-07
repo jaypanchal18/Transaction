@@ -1,0 +1,697 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+
+.login-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: url('./images//loginbg.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.login-container {
+  display: flex;
+  background: white; /* Slightly transparent white background */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 900px;
+  width: 100%;
+}
+
+.login-form {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-title {
+  font-size: 6rem; 
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.login-subtitle {
+  font-size: 5rem;
+  margin-bottom: 2rem;
+}
+
+.login-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.login-button {
+  margin-top: 1rem;
+  background-color: #6a11cb;
+  color: #fff;
+}
+
+.login-message {
+  margin-top: 1rem;
+}
+
+.login-footer {
+  margin-top: 1rem;
+  color: #777;
+}
+
+.forgot-password {
+  display: block;
+  margin: 1rem 0;
+  text-align: right;
+  color: #6a11cb;
+}
+
+.login-icons {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.login-icon {
+  margin: 0 0.5rem;
+  color: #fff;
+  background-color: #6a11cb;
+}
+
+.login-image img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+@media (max-width: 960px) {
+  .login-container {
+    flex-direction: column;
+  }
+
+  .login-form,
+  .login-image {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-page {
+    padding: 1rem;
+  }
+
+  .login-form {
+    padding: 1.5rem;
+  }
+
+  .login-title {
+    font-size: 1.8rem; /* Adjusted for smaller screens */
+  }
+
+  .login-subtitle {
+    font-size: 0.9rem; /* Adjusted for smaller screens */
+  }
+
+  .login-box {
+    padding: 1rem;
+  }
+
+  .forgot-password {
+    font-size: 0.9rem;
+  }
+
+  .login-icons {
+    flex-direction: column;
+  }
+
+  .login-icon {
+    margin: 0.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-page {
+    padding: 0.5rem;
+  }
+
+  .login-form {
+    padding: 1rem;
+  }
+
+  .login-title {
+    font-size: 1.5rem; /* Adjusted for mobile screens */
+  }
+
+  .login-subtitle {
+    font-size: 0.8rem; /* Adjusted for mobile screens */
+  }
+
+  .login-box {
+    padding: 0.5rem;
+  }
+
+  .forgot-password {
+    font-size: 0.8rem;
+  }
+
+  .login-icons {
+    flex-direction: column;
+  }
+
+  .login-icon {
+    margin: 0.3rem 0;
+  }
+}
+.error-message {
+  color: white;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+}
+
+
+
+
+
+auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #6a11cb, #2575fc);
+  padding: 2rem;
+}
+
+.signup-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: url('./images/loginbg.png') no-repeat center center fixed;
+  background-size: cover;
+}
+
+.signup-box {
+  display: flex;
+  flex-direction: column;
+  background: white; /* Slightly transparent white background */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+}
+
+.signup-title {
+  font-size: 2.5rem; 
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.signup-box form {
+  display: flex;
+  flex-direction: column;
+}
+
+.signup-button {
+  margin-top: 1rem;
+  background-color: #6a11cb;
+  color: #fff;
+}
+
+.signup-message {
+  margin-top: 1rem;
+}
+
+.signup-footer {
+  margin-top: 1rem;
+  color: #777;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .signup-page {
+    padding: 1rem;
+  }
+
+  .signup-box {
+    padding: 1.5rem;
+  }
+
+  .signup-title {
+    font-size: 1.8rem; /* Adjusted for smaller screens */
+  }
+
+  .signup-footer {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .signup-page {
+    padding: 0.5rem;
+  }
+
+  .signup-box {
+    padding: 1rem;
+  }
+
+  .signup-title {
+    font-size: 1.5rem; /* Adjusted for mobile screens */
+  }
+
+  .signup-footer {
+    font-size: 0.8rem;
+  }
+}
+
+
+
+  
+/* General Dashboard Styles */
+.protected-dashboard {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(to right, #4a00e0, #8e2de2);
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.dashboard-content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* Align items to the top */
+  padding: 1rem; /* Add padding to ensure content doesn't touch the edges */
+  margin-top: 4rem; /* Space from the navbar */
+}
+
+/* Card Styles */
+.card {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 600px; /* Default max-width for smaller screens */
+  box-sizing: border-box; /* Ensure padding and border are included in width calculation */
+  margin: 0 auto; /* Center the card horizontally */
+}
+
+/* Title */
+.title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #333;
+}
+
+/* TextField and Button Styles */
+.textfield {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.button {
+  background: linear-gradient(to right, #4a00e0, #8e2de2);
+  color: #fff;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  width: 100%;
+  text-align: center;
+}
+
+.button:hover {
+  background: linear-gradient(to right, #3a00c0, #7e2db2);
+}
+
+.message {
+  margin-top: 1rem;
+  color: red;
+}
+
+.edit-form {
+  background-color: #ffffff; /* White background for better visibility */
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px; /* Adjust width as needed */
+}
+
+.textfield {
+  margin-bottom: 1rem; /* Add some space between fields */
+}
+
+.button {
+  margin-top: 1rem;
+}
+
+/* Responsive Design for Mobile */
+@media (max-width: 768px) {
+  .card {
+    padding: 1.5rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .button {
+    padding: 0.4rem;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .button {
+    padding: 0.3rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Larger Card for Laptops and Larger Screens */
+@media (min-width: 1024px) {
+  .card {
+    max-width: 900px; /* Increase max-width for larger screens */
+  }
+}
+
+/* Additional Styles */
+.avatar {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1rem;
+}
+
+.verified-text {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.edit-form {
+  margin-top: 1rem;
+}
+
+.list-item {
+  background-color: #333;
+  color: #fff;
+}
+
+
+
+
+/* forgot password css */
+.forgot-password-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #4a00e0, #8e2de2);
+  padding: 1rem; /* Ensure padding on small screens */
+}
+
+.forgot-password-box {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.forgot-password-title {
+  margin-bottom: 1.5rem;
+}
+
+.forgot-password-button {
+  background: linear-gradient(to right, #4a00e0, #8e2de2);
+  color: #fff;
+  margin-top: 1rem;
+  padding: 0.5rem;
+}
+
+.forgot-password-button:hover {
+  background: linear-gradient(to right, #3a00c0, #7e2db2);
+}
+
+.forgot-password-message {
+  margin-top: 1rem;
+}
+
+.forgot-password-footer {
+  margin-top: 1rem;
+}
+
+.forgot-password-footer a {
+  color: #8e2de2;
+  text-decoration: none;
+}
+
+.forgot-password-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .forgot-password-box {
+    padding: 1.5rem;
+  }
+
+  .forgot-password-title {
+    font-size: 1.5rem;
+  }
+
+  .forgot-password-button {
+    padding: 0.4rem;
+    font-size: 1rem;
+  }
+
+  .forgot-password-footer {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .forgot-password-box {
+    padding: 1rem;
+  }
+
+  .forgot-password-title {
+    font-size: 1.2rem;
+  }
+
+  .forgot-password-button {
+    padding: 0.3rem;
+    font-size: 0.9rem;
+  }
+
+  .forgot-password-footer {
+    font-size: 0.8rem;
+  }
+}
+
+
+
+/* Profile Change*/
+
+/* Container for the profile page */
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to right, #4a00e0, #8e2de2);
+  padding: 2rem;
+}
+
+.profile-title {
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.profile-card {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 1rem;
+}
+
+.profile-card-content {
+  margin-bottom: 1.5rem;
+}
+
+.profile-details {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.profile-form {
+  margin-top: 1rem;
+}
+
+.profile-form .MuiTextField-root {
+  margin-bottom: 1rem;
+}
+
+.profile-button {
+  background: linear-gradient(to right, #4a00e0, #8e2de2);
+  color: #fff;
+  margin-top: 1rem;
+}
+
+.profile-button:hover {
+  background: linear-gradient(to right, #3a00c0, #7e2db2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 1.5rem;
+  }
+
+  .profile-title {
+    font-size: 1.5rem;
+  }
+
+  .profile-card {
+    padding: 1.5rem;
+  }
+
+  .profile-button {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 1rem;
+  }
+
+  .profile-title {
+    font-size: 1.2rem;
+  }
+
+  .profile-card {
+    padding: 1rem;
+  }
+
+  .profile-button {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
+}
+
+
+
+
+/* Transaction page css */
+
+.transaction-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.transaction-form input {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.transaction-list {
+  list-style: none;
+  padding: 0;
+}
+
+.transaction-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #eee;
+  margin-bottom: 5px;
+}
+
+.budget-notifications {
+  list-style: none;
+  padding: 0;
+}
+
+.budget-notifications li {
+  padding: 10px;
+  border: 1px solid #eee;
+  margin-bottom: 5px;
+  background-color: #f9f9f9;
+}
+
+
+
+
+
+
+
+
+.dashboard-container {
+  /* Replace with your image path */
+  background-size: cover;
+  background-position: center;
+  padding: 20px;
+}
+
+.dashboard-title {
+  color: #ffffff; /* Adjust color for better contrast */
+  text-align: center;
+}
+
+.dashboard-card {
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 3px 5px 2px rgba(255, 105, 135, .3);
+  border-radius: 10px;
+}
+
+.dashboard-card-title {
+  color: #333; /* Darker text for better readability */
+}
+
+.chart-title {
+  margin-top: 20px;
+  color: #ffffff; /* Adjust color for better contrast */
+}
+
+.report-title {
+  margin-top: 20px;
+  color: #ffffff; /* Adjust color for better contrast */
+}
+
+
+
+
+
+
+
+
+
