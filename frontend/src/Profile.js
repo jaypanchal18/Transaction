@@ -13,15 +13,17 @@ function Profile() {
   const [mobile, setMobile] = useState('');
 
   useEffect(() => {
-    // Fetch user profile details
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+        const token = localStorage.getItem('accessToken');
+        if (!token) throw new Error('No token found');
+
         const response = await axios.get('http://localhost:5000/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log('Profile response:', response.data);
         const { username, email, mobile } = response.data;
         setCurrentDetails({ username, email, mobile });
         setUsername(username);
@@ -29,6 +31,16 @@ function Profile() {
         setMobile(mobile);
       } catch (error) {
         console.error('Error fetching profile:', error);
+        if (error.response) {
+          console.error('Error response:', error.response.data);
+          console.error('Error status:', error.response.status);
+        }
+        if (error.request) {
+          console.error('Error request:', error.request);
+        }
+        if (error.message) {
+          console.error('Error message:', error.message);
+        }
         if (error.response && error.response.status === 401) {
           navigate('/login');
         }
@@ -41,8 +53,10 @@ function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
-      await axios.put(
+      const token = localStorage.getItem('accessToken');
+      if (!token) throw new Error('No token found');
+
+      const response = await axios.put(
         'http://localhost:5000/profile',
         { username, email, mobile },
         {
@@ -51,10 +65,14 @@ function Profile() {
           },
         }
       );
+      console.log('Profile update response:', response.data);
       alert('Profile updated successfully!');
       navigate('/protected');
     } catch (error) {
       console.error('Error updating profile:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      }
       alert('Failed to update profile.');
     }
   };

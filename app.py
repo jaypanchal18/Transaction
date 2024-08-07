@@ -250,12 +250,19 @@ def update_profile():
         'mobile': data.get('mobile')
     }
 
+    # Debugging print statements
+    print(f"Current User: {current_user}")
+    print(f"Update Data: {update_data}")
+
     result = users.update_one({'username': current_user}, {'$set': update_data})
+
+    print(f"Update Result: {result.matched_count}, {result.modified_count}")
 
     if result.modified_count == 1:
         return jsonify({"msg": "Profile updated successfully"}), 200
     else:
         return jsonify({"msg": "Profile update failed"}), 400
+
     
 
 
