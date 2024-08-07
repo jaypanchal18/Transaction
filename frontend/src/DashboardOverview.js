@@ -72,9 +72,9 @@ const DashboardOverview = () => {
 
   useEffect(() => {
     fetchData();
-    const intervalId = setInterval(fetchData, 60000); // Poll every 60 seconds for real-time updates
+    const intervalId = setInterval(fetchData, 60000); 
 
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+    return () => clearInterval(intervalId); 
   }, []);
 
   const handleReportPeriodChange = (event) => {

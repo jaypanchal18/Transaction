@@ -91,7 +91,7 @@ function Login() {
             </Typography>
             <br/>
             <TextField
-              label="Email Address"
+              label="User Name"
               variant="outlined"
               fullWidth
               margin="normal"
