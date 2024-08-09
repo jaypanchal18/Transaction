@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, redirect, jsonify
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_cors import CORS
 from flask_pymongo import PyMongo
@@ -10,9 +10,10 @@ import string
 from datetime import datetime, timedelta
 from bson import ObjectId
 import logging
+import requests
 from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
-import datetime
+from google.auth.transport import requests
+import token
 
 
 app = Flask(__name__)
@@ -32,9 +33,72 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'jay.nit47@gmail.com'
 app.config['MAIL_PASSWORD'] = 'xjzi akki ibaz dmam'
 app.config['MAIL_DEFAULT_SENDER'] = 'Crud Operation''jay.nit47@gmail.com'
+
 mail = Mail(app)
 
+
+GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
+GOOGLE_CLIENT_ID = '799143067220-vui9bt316m1r4pltog67gohcqi1krsk8.apps.googleusercontent.com'
+GOOGLE_CLIENT_SECRET = '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'  # Replace with your actual client secret
+REDIRECT_URI = 'http://localhost:3000/protected'
+
+CLIENT_ID = '799143067220-vui9bt316m1r4pltog67gohcqi1krsk8.apps.googleusercontent.com'
+
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+
+
+
+def verify_id_token(id_token):
+    try:
+        id_info = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
+        return id_info
+    except ValueError as e:
+        print(f"Invalid ID token: {e}")
+        return None
+
+@app.route('/google-login', methods=['POST'])
+def google_login():
+    code = request.args.get('code')
+
+    if not code:
+        return jsonify({'error': 'Missing authorization code'}), 400
+
+    # Exchange authorization code for tokens
+    response = requests.post(GOOGLE_TOKEN_URL, data={
+        'code': '4%2F0AcvDMrA0qVfbhRBKMSIYGsxNl4852l45MdzsK_x2o_V7aTKt4Pj-dRPa65IuI9EBMIotdw',
+        'client_id': '799143067220-vui9bt316m1r4pltog67gohcqi1krsk8.apps.googleusercontent.com',
+        'client_secret': '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',
+        'redirect_uri': 'http://localhost:3000/protected',
+        'grant_type': 'authorization_code'
+    })
+
+    token_response = response.json()
+
+    if 'error' in token_response:
+        return jsonify({'error': token_response['error_description']}), 400
+
+    access_token = token_response.get('access_token')
+    id_token = token_response.get('id_token')
+
+    # Verify ID token
+    id_info = verify_id_token(id_token)
+    if not id_info:
+        return jsonify({'error': 'Invalid ID token'}), 400
+
+    # Extract user information
+    user_id = id_info['sub']
+    email = id_info['email']
+    name = id_info['name']
+
+    # You can now use this information to log the user in or create a new user account
+
+    return jsonify({
+        'access_token': access_token,
+        'id_token': id_token,
+        'user_id': user_id,
+        'email': email,
+        'name': name
+    })
 
 
 
@@ -124,40 +188,7 @@ def login():
 
 
 
-@app.route('/google-login', methods=['POST'])
-def google_login():
-    data = request.get_json()
-    token = data.get('token')
 
-    try:
-        idinfo = id_token.verify_oauth2_token(token, google_requests.Request(), app.config['188656099171-j2toqn6u865c05epp4aggd8fgvm1k0oe.apps.googleusercontent.com'])
-        google_user_id = idinfo['sub']
-        email = idinfo['email']
-        username = idinfo.get('name', email)
-
-        users = mongo.db.users
-        user = users.find_one({'email': email})
-
-        if not user:
-            # Create a new user if not exists
-            user_data = {
-                'username': username,
-                'email': email,
-                'verified': True  # Assuming Google users are verified by default
-            }
-            users.insert_one(user_data)
-            access_token = create_access_token(identity=username)
-            return jsonify(access_token=access_token), 201
-
-        # Existing user
-        if not user['verified']:
-            return jsonify({"msg": "Please verify your email address. Check your inbox for the verification link."}), 403
-
-        access_token = create_access_token(identity=username)
-        return jsonify(access_token=access_token), 200
-
-    except ValueError as e:
-        return jsonify({"msg": "Invalid Google token"}), 400
 
 
 @app.route('/forgot-password', methods=['POST'])
@@ -250,19 +281,12 @@ def update_profile():
         'mobile': data.get('mobile')
     }
 
-    # Debugging print statements
-    print(f"Current User: {current_user}")
-    print(f"Update Data: {update_data}")
-
     result = users.update_one({'username': current_user}, {'$set': update_data})
-
-    print(f"Update Result: {result.matched_count}, {result.modified_count}")
 
     if result.modified_count == 1:
         return jsonify({"msg": "Profile updated successfully"}), 200
     else:
         return jsonify({"msg": "Profile update failed"}), 400
-
     
 
 

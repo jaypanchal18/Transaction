@@ -11,7 +11,7 @@ import Transaction from './Transaction';
 import DashboardOverview from './DashboardOverview';
 
 
-
+import OAuthCallback from './OAuth2Callback';
 
 
 
@@ -23,6 +23,7 @@ function App() {
     <Router>
       <div className="App">
         <Routes>
+        <Route path="/oauth2callback" element={<OAuthCallback />} />
           <Route path="/" element={<Navigate to="/signup" />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/login" element={<Login />} />
@@ -32,6 +33,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/transaction" element={<Transaction />} />
           <Route path="/Dashboard" element={<DashboardOverview />} />
+
 
 
           

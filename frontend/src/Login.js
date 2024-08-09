@@ -1,15 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Box, Grid } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css'; // Importing CSS for styling
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import loginimage from './images/login.jpg'
-import { GoogleLogin } from 'react-google-login';
+import loginimage from './images/login.jpg';
 
-import './Auth.css';
+const clientId = '799143067220-vui9bt316m1r4pltog67gohcqi1krsk8.apps.googleusercontent.com';
+const redirectUri = 'http://localhost:3000/protected'; // Your redirect URI
+const scope = 'email profile openid';
 
+const generateAuthUrl = () => {
+  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+};
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -17,6 +21,15 @@ function Login() {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+
+  useEffect(() => {
+    // Load Google API script
+    const script = document.createElement('script');
+    script.src = 'https://apis.google.com/js/platform.js';
+    script.onload = () => console.log('Google API script loaded.');
+    script.onerror = (error) => console.error('Failed to load Google API script:', error);
+    document.head.appendChild(script);
+  }, []);
 
   const handleLogin = async () => {
     setErrors({});
@@ -32,14 +45,8 @@ function Login() {
     }
 
     try {
-
       const response = await axios.post('http://localhost:5000/login', { username, password });
-      
-      // Ensure token is correctly stored
       localStorage.setItem('accessToken', response.data.access_token);
-
-     
-
       setMessage('Login successful');
       navigate('/protected');
     } catch (error) {
@@ -51,33 +58,11 @@ function Login() {
     }
   };
 
-
-  const handleGoogleResponse = async (response) => {
-    if (response.error) {
-      console.error('Google Login failed:', response.error);
-      setMessage('Google login failed');
-      return;
-    }
-
-    const { tokenId } = response;
-    
-    try {
-      // Exchange tokenId with your backend or use it as needed
-      const googleResponse = await axios.post('http://localhost:5000/google-login', { tokenId });
-
-      // Store token and other user data
-      localStorage.setItem('accessToken', googleResponse.data.access_token);
-      setMessage('Google login successful');
-      navigate('/protected');
-    } catch (error) {
-      console.error('Error handling Google login:', error);
-      setMessage('An error occurred with Google login');
-    }
+  const handleGoogleSignIn = () => {
+    window.location.href = generateAuthUrl();
   };
 
   return (
-
-    
     <div className="login-page">
       <Grid container justifyContent="center" alignItems="center" className="login-container">
         <Grid item xs={12} md={6} className="login-form">
@@ -131,29 +116,15 @@ function Login() {
               or login with
             </Typography>
             <div className="login-icons">
-            <GoogleLogin
-                clientId="188656099171-j2toqn6u865c05epp4aggd8fgvm1k0oe.apps.googleusercontent.com"
-                buttonText="Login with Google"
-                onSuccess={handleGoogleResponse}
-                onFailure={handleGoogleResponse}
-                cookiePolicy={'single_host_origin'}
-                render={renderProps => (
-                  <Button
-                    variant="outlined"
-                    startIcon={<GoogleIcon />}
-                    className="login-icon"
-                    style={{ marginRight: '10px' }}
-                    onClick={renderProps.onClick}
-                    disabled={renderProps.disabled}
-                  >
-                    Google
-                  </Button> )}
-              />
-
-
-
-
-
+              <Button
+                variant="outlined"
+                startIcon={<GoogleIcon />}
+                className="login-icon"
+                style={{ marginRight: '10px' }}
+                onClick={handleGoogleSignIn}
+              >
+                Google
+              </Button>
               <Button variant="outlined" startIcon={<FacebookIcon />} className="login-icon">
                 Facebook
               </Button>
@@ -164,10 +135,7 @@ function Login() {
           <img src={loginimage} alt="Login illustration" />
         </Grid>
       </Grid>
-
-    
     </div>
- 
   );
 }
 
