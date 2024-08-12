@@ -7,13 +7,7 @@ import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import loginimage from './images/login.jpg';
 
-const clientId = '799143067220-vui9bt316m1r4pltog67gohcqi1krsk8.apps.googleusercontent.com';
-const redirectUri = 'http://localhost:3000/protected'; // Your redirect URI
-const scope = 'email profile openid';
-
-const generateAuthUrl = () => {
-  return `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
-};
+const googleAuthUrl = `http://localhost:5001/google-login`;
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -21,15 +15,6 @@ function Login() {
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Load Google API script
-    const script = document.createElement('script');
-    script.src = 'https://apis.google.com/js/platform.js';
-    script.onload = () => console.log('Google API script loaded.');
-    script.onerror = (error) => console.error('Failed to load Google API script:', error);
-    document.head.appendChild(script);
-  }, []);
 
   const handleLogin = async () => {
     setErrors({});
@@ -58,9 +43,36 @@ function Login() {
     }
   };
 
-  const handleGoogleSignIn = () => {
-    window.location.href = generateAuthUrl();
+  const handleGoogleSignIn = async () => {
+    try {
+      const response = await axios.get(googleAuthUrl);
+      window.location.href = response.data.auth_url; // Redirect user to Google for login
+    } catch (error) {
+      console.error('Error during Google sign-in:', error);
+    }
   };
+  
+
+  useEffect(() => {
+    const handleAuthCode = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      if (code) {
+        try {
+          const response = await axios.post('http://localhost:5001/google-callback', { code });
+          const { access_token, redirect_url } = response.data;
+          localStorage.setItem('accessToken', access_token);
+          window.location.href = redirect_url; // Redirect user to the dashboard or protected area
+        } catch (error) {
+          console.error('Error during Google login:', error);
+        }
+      }
+    };
+  
+    handleAuthCode();
+  }, []);
+
+  
 
   return (
     <div className="login-page">

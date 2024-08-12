@@ -77,6 +77,9 @@ function Profile() {
     }
   };
 
+
+  
+
   return (
     <div className="profile-container">
       <Navbar /> 

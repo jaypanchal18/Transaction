@@ -71,6 +71,29 @@ const DashboardOverview = () => {
   };
 
   useEffect(() => {
+
+    axios.get('http://localhost:5000/protected', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+    .then((res) => {
+      setData(res.data); // Store the response data in state
+    })
+    .catch((err) => {
+      setError('Access denied');
+      console.error('Access denied', err);
+    });
+
+
+
+
+
+
+
+
+
+
     fetchData();
     const intervalId = setInterval(fetchData, 60000); 
 
@@ -122,6 +145,8 @@ const DashboardOverview = () => {
   }));
 
   return (
+
+    
     <Container>
       <Typography variant="h4" gutterBottom>
         Dashboard Overview

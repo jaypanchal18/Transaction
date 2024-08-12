@@ -33,75 +33,12 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'jay.nit47@gmail.com'
 app.config['MAIL_PASSWORD'] = 'xjzi akki ibaz dmam'
 app.config['MAIL_DEFAULT_SENDER'] = 'Crud Operation''jay.nit47@gmail.com'
-
 mail = Mail(app)
 
 
-GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
-GOOGLE_CLIENT_ID = '799143067220-vui9bt316m1r4pltog67gohcqi1krsk8.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET = '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'  # Replace with your actual client secret
-REDIRECT_URI = 'http://localhost:3000/protected'
 
-CLIENT_ID = '799143067220-vui9bt316m1r4pltog67gohcqi1krsk8.apps.googleusercontent.com'
 
 CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
-
-
-
-def verify_id_token(id_token):
-    try:
-        id_info = id_token.verify_oauth2_token(token, requests.Request(), CLIENT_ID)
-        return id_info
-    except ValueError as e:
-        print(f"Invalid ID token: {e}")
-        return None
-
-@app.route('/google-login', methods=['POST'])
-def google_login():
-    code = request.args.get('code')
-
-    if not code:
-        return jsonify({'error': 'Missing authorization code'}), 400
-
-    # Exchange authorization code for tokens
-    response = requests.post(GOOGLE_TOKEN_URL, data={
-        'code': '4%2F0AcvDMrA0qVfbhRBKMSIYGsxNl4852l45MdzsK_x2o_V7aTKt4Pj-dRPa65IuI9EBMIotdw',
-        'client_id': '799143067220-vui9bt316m1r4pltog67gohcqi1krsk8.apps.googleusercontent.com',
-        'client_secret': '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',
-        'redirect_uri': 'http://localhost:3000/protected',
-        'grant_type': 'authorization_code'
-    })
-
-    token_response = response.json()
-
-    if 'error' in token_response:
-        return jsonify({'error': token_response['error_description']}), 400
-
-    access_token = token_response.get('access_token')
-    id_token = token_response.get('id_token')
-
-    # Verify ID token
-    id_info = verify_id_token(id_token)
-    if not id_info:
-        return jsonify({'error': 'Invalid ID token'}), 400
-
-    # Extract user information
-    user_id = id_info['sub']
-    email = id_info['email']
-    name = id_info['name']
-
-    # You can now use this information to log the user in or create a new user account
-
-    return jsonify({
-        'access_token': access_token,
-        'id_token': id_token,
-        'user_id': user_id,
-        'email': email,
-        'name': name
-    })
-
-
-
 
 
 @app.route('/signup', methods=['POST'])
@@ -188,9 +125,6 @@ def login():
 
 
 
-
-
-
 @app.route('/forgot-password', methods=['POST'])
 def forgot_password():
     data = request.get_json()
@@ -262,7 +196,7 @@ def protected():
 def get_profile():
     current_user = get_jwt_identity()
     users = mongo.db.users
-    user = users.find_one({'username': current_user}, {'_id': 0, 'password': 0, 'verification_token': 0})
+    user = users.find_one({'$or': [{'username': current_user}, {'email': current_user}]}, {'_id': 0, 'password': 0, 'verification_token': 0})
     if user:
         return jsonify(user), 200
     else:
