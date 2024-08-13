@@ -5,8 +5,6 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css';  // Importing CSS for styling
 
-// Replace with your live backend URL
-
 function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -29,8 +27,10 @@ function ForgotPassword() {
     try {
       await axios.post(`http://localhost:5000/forgot-password`, { email });
       setStep('reset'); // Move to OTP entry step
+      setMessage('OTP has been sent to your email.');
     } catch (error) {
-      setMessage(error.response?.data?.msg || 'An error occurred');
+      console.error('Error requesting OTP:', error);  // Log the error to console
+      setMessage(error.response?.data?.msg || 'An error occurred while requesting OTP.');
     }
   };
 
@@ -50,7 +50,8 @@ function ForgotPassword() {
       await axios.post(`http://localhost:5000/reset-password`, { email, otp, password: newPassword });
       navigate('/login'); // Redirect to login page
     } catch (error) {
-      setMessage(error.response?.data?.msg || 'An error occurred');
+      console.error('Error resetting password:', error);  // Log the error to console
+      setMessage(error.response?.data?.msg || 'An error occurred while resetting password.');
     }
   };
 
@@ -83,7 +84,7 @@ function ForgotPassword() {
               >
                 Request OTP
               </Button>
-              {message && <Typography variant="body2" color="error" className="forgot-password-message">{message}</Typography>}
+              {message && <Typography variant="body2" color={message.startsWith('Error') ? 'error' : 'primary'} className="forgot-password-message">{message}</Typography>}
             </form>
           ) : (
             <form onSubmit={handleResetPassword}>
@@ -117,7 +118,7 @@ function ForgotPassword() {
               >
                 Reset Password
               </Button>
-              {message && <Typography variant="body2" color="error" className="forgot-password-message">{message}</Typography>}
+              {message && <Typography variant="body2" color={message.startsWith('Error') ? 'error' : 'primary'} className="forgot-password-message">{message}</Typography>}
             </form>
           )}
         </Box>

@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { TextField, Button, Typography, Box, Grid } from '@mui/material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Auth.css'; // Importing CSS for styling
 import GoogleIcon from '@mui/icons-material/Google';
 import FacebookIcon from '@mui/icons-material/Facebook';
-import loginimage from './images/login.jpg'
-import { GoogleLogin } from 'react-google-login';
+import loginimage from './images/login.jpg';
 
-import './Auth.css';
-
+const googleAuthUrl = `http://localhost:5001/google-login`;
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -32,14 +30,8 @@ function Login() {
     }
 
     try {
-
       const response = await axios.post('http://localhost:5000/login', { username, password });
-      
-      // Ensure token is correctly stored
       localStorage.setItem('accessToken', response.data.access_token);
-
-     
-
       setMessage('Login successful');
       navigate('/protected');
     } catch (error) {
@@ -51,33 +43,38 @@ function Login() {
     }
   };
 
-
-  const handleGoogleResponse = async (response) => {
-    if (response.error) {
-      console.error('Google Login failed:', response.error);
-      setMessage('Google login failed');
-      return;
-    }
-
-    const { tokenId } = response;
-    
+  const handleGoogleSignIn = async () => {
     try {
-      // Exchange tokenId with your backend or use it as needed
-      const googleResponse = await axios.post('http://localhost:5000/google-login', { tokenId });
-
-      // Store token and other user data
-      localStorage.setItem('accessToken', googleResponse.data.access_token);
-      setMessage('Google login successful');
-      navigate('/protected');
+      const response = await axios.get(googleAuthUrl);
+      window.location.href = response.data.auth_url; // Redirect user to Google for login
     } catch (error) {
-      console.error('Error handling Google login:', error);
-      setMessage('An error occurred with Google login');
+      console.error('Error during Google sign-in:', error);
     }
   };
+  
+
+  useEffect(() => {
+    const handleAuthCode = async () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      if (code) {
+        try {
+          const response = await axios.post('http://localhost:5001/google-callback', { code });
+          const { access_token, redirect_url } = response.data;
+          localStorage.setItem('accessToken', access_token);
+          window.location.href = redirect_url; // Redirect user to the dashboard or protected area
+        } catch (error) {
+          console.error('Error during Google login:', error);
+        }
+      }
+    };
+  
+    handleAuthCode();
+  }, []);
+
+  
 
   return (
-
-    
     <div className="login-page">
       <Grid container justifyContent="center" alignItems="center" className="login-container">
         <Grid item xs={12} md={6} className="login-form">
@@ -131,29 +128,15 @@ function Login() {
               or login with
             </Typography>
             <div className="login-icons">
-            <GoogleLogin
-                clientId="188656099171-j2toqn6u865c05epp4aggd8fgvm1k0oe.apps.googleusercontent.com"
-                buttonText="Login with Google"
-                onSuccess={handleGoogleResponse}
-                onFailure={handleGoogleResponse}
-                cookiePolicy={'single_host_origin'}
-                render={renderProps => (
-                  <Button
-                    variant="outlined"
-                    startIcon={<GoogleIcon />}
-                    className="login-icon"
-                    style={{ marginRight: '10px' }}
-                    onClick={renderProps.onClick}
-                    disabled={renderProps.disabled}
-                  >
-                    Google
-                  </Button> )}
-              />
-
-
-
-
-
+              <Button
+                variant="outlined"
+                startIcon={<GoogleIcon />}
+                className="login-icon"
+                style={{ marginRight: '10px' }}
+                onClick={handleGoogleSignIn}
+              >
+                Google
+              </Button>
               <Button variant="outlined" startIcon={<FacebookIcon />} className="login-icon">
                 Facebook
               </Button>
@@ -164,10 +147,7 @@ function Login() {
           <img src={loginimage} alt="Login illustration" />
         </Grid>
       </Grid>
-
-    
     </div>
- 
   );
 }
 

@@ -71,10 +71,33 @@ const DashboardOverview = () => {
   };
 
   useEffect(() => {
-    fetchData();
-    const intervalId = setInterval(fetchData, 60000); // Poll every 60 seconds for real-time updates
 
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount
+    axios.get('http://localhost:5000/protected', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+    .then((res) => {
+      setData(res.data); // Store the response data in state
+    })
+    .catch((err) => {
+      setError('Access denied');
+      console.error('Access denied', err);
+    });
+
+
+
+
+
+
+
+
+
+
+    fetchData();
+    const intervalId = setInterval(fetchData, 60000); 
+
+    return () => clearInterval(intervalId); 
   }, []);
 
   const handleReportPeriodChange = (event) => {
@@ -122,6 +145,8 @@ const DashboardOverview = () => {
   }));
 
   return (
+
+    
     <Container>
       <Typography variant="h4" gutterBottom>
         Dashboard Overview
