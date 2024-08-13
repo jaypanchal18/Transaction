@@ -1,12 +1,11 @@
-# routes/transactions.py
-from flask import Blueprint, request, jsonify,current_app
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import mongo
+from backend.app import mongo
 from bson import ObjectId
 
 transactions_bp = Blueprint('transactions', __name__)
 
-@transactions_bp.route('/transaction', methods=['POST'])
+@transactions_bp.route('/', methods=['POST'])
 @jwt_required()
 def add_transaction():
     data = request.get_json()
@@ -26,9 +25,9 @@ def add_transaction():
     }
     mongo.db.transactions.insert_one(transaction)
     return jsonify({"msg": "Transaction added successfully"}), 201
-    pass
 
-@transactions_bp.route('/transaction/<transaction_id>', methods=['PUT'])
+
+@transactions_bp.route('/<transaction_id>', methods=['PUT'])
 @jwt_required()
 def update_transaction(transaction_id):
     data = request.get_json()
@@ -58,9 +57,10 @@ def update_transaction(transaction_id):
         return jsonify({"msg": "Transaction updated successfully"}), 200
     else:
         return jsonify({"msg": "Transaction not found"}), 404
-    pass
+    
 
-@transactions_bp.route('/transaction/<transaction_id>', methods=['DELETE'])
+
+@transactions_bp.route('/<transaction_id>', methods=['DELETE'])
 @jwt_required()
 def delete_transaction(transaction_id):
     username = get_jwt_identity()
@@ -76,14 +76,13 @@ def delete_transaction(transaction_id):
         return jsonify({"msg": "Transaction deleted successfully"}), 200
     else:
         return jsonify({"msg": "Transaction not found"}), 404
-    pass
+    
 
-@transactions_bp.route('/transactions', methods=['GET'])
+
+@transactions_bp.route('/', methods=['GET'])
 @jwt_required()
 def get_transactions():
     username = get_jwt_identity()
-    mongo = current_app.extensions['pymongo']
-    
     transactions = mongo.db.transactions.find({'username': username})
     return jsonify([{
         'id': str(txn['_id']),
@@ -96,27 +95,4 @@ def get_transactions():
     } for txn in transactions]), 200
 
 
-def is_on_budget(spent, budget_amount, tolerance=0.01):
-    return spent <= (budget_amount + tolerance)
 
-
-def get_spending_by_category(username):
-    transactions = mongo.db.transactions.find({'username': username})
-    spending_by_category = {}
-    for txn in transactions:
-        category = txn.get('category')
-        amount = txn.get('amount', 0)
-        try:
-            amount = float(amount)
-        except ValueError:
-            amount = 0.0  # Ensure amount is a float
-
-        if category:
-            # Add to existing category or initialize if not present
-            if category in spending_by_category:
-                spending_by_category[category] += amount
-            else:
-                spending_by_category[category] = amount
-                
-    return spending_by_category
-    pass

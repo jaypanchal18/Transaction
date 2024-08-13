@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useCallback } from 'react';
 import Navbar from './UserDashboard'; 
 import Report from './DashboardOverview'
 
 import {
   TextField,
+  Grid,
   Button,
   Typography,
   Box,
@@ -23,7 +24,7 @@ import {
 import axios from 'axios';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 import './Auth.css'; // Importing CSS for styling
 
  
@@ -55,14 +56,10 @@ function Transaction() {
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState({ message: '', severity: '' });
 
-  const navigate = useNavigate();
+  //const navigate = useNavigate();
 
-  // Fetch transactions and budgets when the component mounts
-  useEffect(() => {
-    fetchData();
-  }, [navigate]);
-
-  const fetchData = async () => {
+  // Define fetchData as a useCallback to memoize it and avoid unnecessary re-renders
+  const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
   
@@ -98,18 +95,24 @@ function Transaction() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   
 
-  const calculateSpending = (category) => {
-    const totalSpent = transactions
-      .filter((txn) => txn.category === category)
-      .reduce((acc, txn) => acc + txn.amount, 0);
-
-    const budget = budgets.find((budg) => budg.category === category);
-    return { totalSpent, budget: budget ? budget.amount : 0 };
-  };
-
+  
+// Remove the unused calculateSpending function
+  // const calculateSpending = (category) => {
+  //   const totalSpent = transactions
+  //     .filter((txn) => txn.category === category)
+  //     .reduce((acc, txn) => acc + txn.amount, 0);
+  
+  //   const budget = budgets.find((budg) => budg.category === category);
+  //   return { totalSpent, budget: budget ? budget.amount : 0 };
+  // };
   const checkBudgetLimit = (budgetTrackingData) => {
     // Check each budget tracking entry
     budgetTrackingData.forEach((budgetTracking) => {
@@ -286,8 +289,12 @@ function Transaction() {
   };
 
   return (
-    <Container maxWidth="md">
-      <Navbar />
+    <div>
+  <Navbar />
+    
+  
+    <Container maxWidth="lg" className="transaction-container">
+      
       <br />
       <br />
       <Typography variant="h4" align="center" gutterBottom>
@@ -299,6 +306,8 @@ function Transaction() {
           {editingTransactionId ? 'Edit Transaction' : 'Add Transaction'}
         </Typography>
         <form noValidate autoComplete="off" onSubmit={handleTransactionSubmit}>
+        <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
           <TextField
             label="Type"
             variant="outlined"
@@ -312,6 +321,8 @@ function Transaction() {
             <option value="expense">Expense</option>
             <option value="income">Income</option>
           </TextField>
+          </Grid>
+            <Grid item xs={12} md={6}>
           <TextField
             label="Amount"
             type="number"
@@ -321,6 +332,8 @@ function Transaction() {
             error={!!transactionErrors.amount}
             helperText={transactionErrors.amount}
           />
+          </Grid>
+          <Grid item xs={12} md={6}>
           <TextField
             label="Category"
             value={category}
@@ -329,6 +342,8 @@ function Transaction() {
             error={!!transactionErrors.category}
             helperText={transactionErrors.category}
           />
+          </Grid>
+          <Grid item xs={12} md={6}>
           <TextField
             label="Date"
             type="date"
@@ -341,21 +356,29 @@ function Transaction() {
             error={!!transactionErrors.date}
             helperText={transactionErrors.date}
           />
+          </Grid>
+          <Grid item xs={12} md={6}>
           <TextField
             label="Receipt"
             value={receipt}
             onChange={(e) => setReceipt(e.target.value)}
             fullWidth
           />
+          </Grid>
+          <Grid item xs={12} md={6}>
           <TextField
             label="Note"
             value={note}
             onChange={(e) => setNote(e.target.value)}
             fullWidth
           />
+          </Grid>
+          <Grid item xs={12}>
           <Button type="submit" variant="contained" color="primary" fullWidth>
             {editingTransactionId ? 'Update Transaction' : 'Add Transaction'}
           </Button>
+          </Grid>
+          </Grid>
         </form>
       </Box>
 
@@ -364,6 +387,8 @@ function Transaction() {
           {editingBudgetId ? 'Edit Budget' : 'Add Budget'}
         </Typography>
         <form noValidate autoComplete="off" onSubmit={handleBudgetSubmit}>
+        <Grid container spacing={2}>
+        <Grid item xs={12} md={6}>
           <TextField
             label="Category"
             value={budgetCategory}
@@ -372,6 +397,8 @@ function Transaction() {
             error={!!budgetErrors.budgetCategory}
             helperText={budgetErrors.budgetCategory}
           />
+           </Grid>
+           <Grid item xs={12} md={6}>
           <TextField
             label="Amount"
             type="number"
@@ -381,6 +408,8 @@ function Transaction() {
             error={!!budgetErrors.budgetAmount}
             helperText={budgetErrors.budgetAmount}
           />
+           </Grid>
+           <Grid item xs={12} md={6}>
           <TextField
             label="Frequency"
             variant="outlined"
@@ -394,13 +423,18 @@ function Transaction() {
             <option value="monthly">Monthly</option>
             <option value="yearly">Yearly</option>
           </TextField>
+          </Grid>
+          <Grid item xs={12} >
           <Button type="submit" variant="contained" color="primary" fullWidth>
             {editingBudgetId ? 'Update Budget' : 'Add Budget'}
           </Button>
+          </Grid>
+          </Grid>
+
         </form>
       </Box>
 
-      <Box mt={4}>
+      <Box mt={3}>
         <Typography variant="h6" gutterBottom>
           Transactions
         </Typography>
@@ -497,6 +531,7 @@ function Transaction() {
         </Alert>
       </Snackbar>
     </Container>
+    </div>
   );
 }
 

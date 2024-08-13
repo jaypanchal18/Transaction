@@ -1,14 +1,13 @@
-# routes/budgets.py
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import mongo
 from bson import ObjectId
-from routes.transactions import get_spending_by_category
-
+from backend.app import mongo
+from datetime import datetime, timedelta
+from app import mongo
 
 budgets_bp = Blueprint('budgets', __name__)
 
-@budgets_bp.route('/budget', methods=['POST'])
+@budgets_bp.route('/', methods=['POST'])
 @jwt_required()
 def create_budget():
     data = request.get_json()
@@ -25,9 +24,10 @@ def create_budget():
     }
     mongo.db.budgets.insert_one(budget)
     return jsonify({"msg": "Budget created successfully"}), 201
-    pass
 
-@budgets_bp.route('/budget/<budget_id>', methods=['PUT'])
+
+
+@budgets_bp.route('/<budget_id>', methods=['PUT'])
 @jwt_required()
 def update_budget(budget_id):
     data = request.get_json()
@@ -54,9 +54,8 @@ def update_budget(budget_id):
         return jsonify({"msg": "Budget updated successfully"}), 200
     else:
         return jsonify({"msg": "Budget not found"}), 404
-    pass
 
-@budgets_bp.route('/budget/<budget_id>', methods=['DELETE'])
+@budgets_bp.route('/<budget_id>', methods=['DELETE'])
 @jwt_required()
 def delete_budget(budget_id):
     username = get_jwt_identity()
@@ -72,28 +71,60 @@ def delete_budget(budget_id):
         return jsonify({"msg": "Budget deleted successfully"}), 200
     else:
         return jsonify({"msg": "Budget not found"}), 404
+    
 
-    pass
-
-@budgets_bp.route('/budgets', methods=['GET'])
+@budgets_bp.route('/', methods=['GET'])
 @jwt_required()
 def get_budgets():
     try:
         username = get_jwt_identity()
+        # Fetch budgets for the authenticated user
         budgets_cursor = mongo.db.budgets.find({'username': username})
-        budgets_list = [{
-            'id': str(budget['_id']),
-            'category': budget.get('category', ''),
-            'amount': float(budget.get('amount', '0')),
-            'frequency': budget.get('frequency', 'Monthly')
-        } for budget in budgets_cursor]
+
+        # Convert cursor to a list of dictionaries, ensuring data is serializable
+        budgets_list = []
+        for budget in budgets_cursor:
+            budget_data = {
+                'id': str(budget['_id']),  # Convert ObjectId to string
+                'category': budget.get('category', ''),  # Default to empty string if not provided
+                'amount': float(budget.get('amount', '0')),  # Convert amount to float, default to '0'
+                'frequency': budget.get('frequency', 'Monthly')  # Default to 'Monthly' if not provided
+            }
+            budgets_list.append(budget_data)
+
         return jsonify(budgets_list), 200
+
     except Exception as e:
-        print(f"Error in get_budgets: {str(e)}")
+        print(f"Error in get_budgets: {str(e)}")  # Log detailed error
         return jsonify({"error": "An error occurred while fetching budgets."}), 500
+    
+
+def is_on_budget(spent, budget_amount, tolerance=0.01):
+    return spent <= (budget_amount + tolerance)
 
 
-@budgets_bp.route('/budgets/track', methods=['GET'])
+def get_spending_by_category(username):
+    transactions = mongo.db.transactions.find({'username': username})
+    spending_by_category = {}
+    for txn in transactions:
+        category = txn.get('category')
+        amount = txn.get('amount', 0)
+        try:
+            amount = float(amount)
+        except ValueError:
+            amount = 0.0  # Ensure amount is a float
+
+        if category:
+            # Add to existing category or initialize if not present
+            if category in spending_by_category:
+                spending_by_category[category] += amount
+            else:
+                spending_by_category[category] = amount
+                
+    return spending_by_category
+
+
+@budgets_bp.route('/track', methods=['GET'])
 @jwt_required()
 def track_budget():
     try:
@@ -154,4 +185,61 @@ def track_budget():
     except Exception as e:
         print(f"Error in track_budget: {str(e)}")  # Log detailed error
         return jsonify({"error": "An error occurred while tracking budgets."}), 500
-    pass
+    
+
+
+
+def filter_transactions_by_period(username, period):
+    today = datetime.now()
+    start_date = None
+
+    if period == 'weekly':
+        start_date = today - timedelta(days=today.weekday())  # Start of the current week (Monday)
+    elif period == 'monthly':
+        start_date = today.replace(day=1)  # Start of the current month
+    elif period == 'yearly':
+        start_date = today.replace(month=1, day=1)  # Start of the current year
+
+    if start_date:
+        print(f"Filtering transactions from: {start_date.strftime('%Y-%m-%d')}")
+        transactions = mongo.db.transactions.find({
+            'username': username,
+            'date': {'$gte': start_date.strftime('%Y-%m-%d')}
+        })
+        return transactions
+    else:
+        return []
+
+def aggregate_transactions(transactions):
+    total_income = 0
+    total_expenses = 0
+
+    for txn in transactions:
+        amount = txn['amount']
+        try:
+            amount = float(amount)
+        except ValueError:
+            amount = 0
+
+        if txn['type'] == 'income':
+            total_income += amount
+        elif txn['type'] == 'expense':
+            total_expenses += amount
+
+    return total_income, total_expenses
+    
+
+@budgets_bp.route('/report/<period>', methods=['GET'])
+@jwt_required()
+def generate_report(period):
+    username = get_jwt_identity()
+    if period not in ['weekly', 'monthly', 'yearly']:
+        return jsonify({"msg": "Invalid period. Choose 'weekly', 'monthly', or 'yearly'"}), 400
+
+    transactions = filter_transactions_by_period(username, period)
+    total_income, total_expenses = aggregate_transactions(transactions)
+
+    return jsonify({
+        'total_income': total_income,
+        'total_expenses': total_expenses
+    }), 200

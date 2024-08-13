@@ -24,7 +24,7 @@ function Navbar() {
           </Typography>
           <div>
             <div className="desktop-nav">
-            <Button color="inherit" onClick={() => navigate('/protected')}>
+              <Button color="inherit" onClick={() => navigate('/transaction')}>
                 Dashboard
               </Button>
               <Button color="inherit" onClick={() => navigate('/profile')}>
@@ -45,7 +45,7 @@ function Navbar() {
                 anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
               >
-                <MenuItem onClick={() => { handleMenuClose(); navigate('/protected'); }}>Dashboard</MenuItem>
+                <MenuItem onClick={() => { handleMenuClose(); navigate('/transaction'); }}>Dashboard</MenuItem>
                 <MenuItem onClick={() => { handleMenuClose(); navigate('/profile'); }}>Profile</MenuItem>
                 <MenuItem onClick={() => { handleMenuClose(); navigate('/login'); }}>Logout</MenuItem>
               </Menu>
@@ -53,6 +53,22 @@ function Navbar() {
           </div>
         </Toolbar>
       </Container>
+      <style jsx>{`
+        .desktop-nav {
+          display: none;
+        }
+        .mobile-nav {
+          display: block;
+        }
+        @media (min-width: 600px) {
+          .desktop-nav {
+            display: flex;
+          }
+          .mobile-nav {
+            display: none;
+          }
+        }
+      `}</style>
     </AppBar>
   );
 }
